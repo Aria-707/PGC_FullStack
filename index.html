@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Asistencia</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos/estilos.css') }}">
+  <script defer src="script.js"></script>
+  <!-- Firebase Compat (v8 style con la v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-compat.js"></script>
+</head>
+<body>
+  <h1>Asistencia por Asignatura</h1>
+
+  <!-- Asignaturas disponibles -->
+  <div>
+    <label><input type="radio" name="asignaturaFiltro" value="Matemáticas"> Matemáticas</label>
+    <label><input type="radio" name="asignaturaFiltro" value="Física"> Física</label>
+    <label><input type="radio" name="asignaturaFiltro" value="Programación"> Programación</label>
+  </div>
+
+  <br>
+
+  <!-- Botones de acción -->
+  <div>
+    <button id="btn-estadis">Estadísticas de asistencia</button>
+    <button id="btn-totalH">Total de horas registradas</button>
+    <button id="btn-reportes">Reportes generados</button>
+  </div>
+
+  <br>
+  <div id="rta"></div>
+
+  <!-- INSERTADAS SOLO ESTAS IMÁGENES -->
+
+  <!-- 1) IA encima -->
+  <div class="ia-encima">
+    <img src="./imagenes/IA.png" alt="Cara de la IA">
+  </div>
+
+  <!-- 2) Logo inferior -->
+  <div class="logo-inferior">
+    <img src="./imagenes/logo_uni.png" alt="Logo de la Universidad">
+  </div>
+
+  <div id="popup-editar" class="popup-overlay" style="display:none;">
+    <div class="popup">
+      <h3>Editar Asistencia</h3>
+      <form id="form-editar" onsubmit="confirmarEdicion(event)">
+        <input type="hidden" id="editar-id" />
+        <label for="editar-estudiante">Nombre:</label>
+        <input type="text" id="editar-estudiante" required />
+        <br><br>
+        <label for="editar-estadoAsistencia">Estado:</label>
+        <select id="editar-estadoAsistencia" required>
+          <option value="Presente">Presente</option>
+          <option value="Ausente">Ausente</option>
+          <option value="Tiene Excusa">Tiene Excusa</option>
+        </select>
+        <br><br>
+        <button type="submit">Guardar</button>
+        <button type="button" onclick="cerrarPopup()">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="popup-eliminar" class="popup-overlay" style="display: none;">
+    <div class="popup">
+      <h3>¿Estás a punto de eliminar el registro?</h3>
+      <div id="resumen-eliminar">
+        <!-- Aquí se insertará el resumen dinámico -->
+      </div>
+      <br>
+      <button onclick="confirmarEliminar()">Eliminar</button>
+      <button onclick="cerrarPopupEliminar()">Cancelar</button>
+    </div>
+  </div>
+
+</body>
+</html>
