@@ -174,7 +174,7 @@
 
   <div id="rta"></div>
 
-  <div id="popup-editar" class="popup-overlay" style="display:none;">
+<div id="popup-editar" class="popup-overlay" style="display:none;">
     <div class="popup">
       <h3>Editar Asistencia</h3>
       <form id="form-editar" onsubmit="confirmarEdicion(event)">
@@ -198,7 +198,9 @@
   <div id="popup-eliminar" class="popup-overlay" style="display: none;">
     <div class="popup">
       <h3>¿Estás a punto de eliminar el registro?</h3>
-      <div id="resumen-eliminar"></div>
+      <div id="resumen-eliminar">
+        <!-- Aquí se insertará el resumen dinámico -->
+      </div>
       <br>
       <button onclick="confirmarEliminar()">Eliminar</button>
       <button onclick="cerrarPopupEliminar()">Cancelar</button>
