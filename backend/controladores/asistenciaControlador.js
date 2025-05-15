@@ -45,25 +45,26 @@ class AsistenciaControlador {
   }
 
   async actualizar(req, res) {
-    try {
-      const { id } = req.params;
-      let body = req.body;
-  
-      if (Buffer.isBuffer(body)) {
-        body = JSON.parse(body.toString("utf8"));
-      }
-  
-      const datosActualizados = {
-        estudiante: body.estudiante,
-        estadoAsistencia: body.estadoAsistencia,
-      };
-  
-      await this.collection.doc(id).update(datosActualizados);
-      res.status(200).send("Actualizado con éxito");
-    } catch (err) {
-      res.status(500).send("Error actualizando: " + err.message);
+  try {
+    const id = req.url.split("/").pop(); // extrae el último segmento de la URL
+    let body = req.body;
+
+    if (Buffer.isBuffer(body)) {
+      body = JSON.parse(body.toString("utf8"));
     }
+
+    const datosActualizados = {
+      estudiante: body.estudiante,
+      estadoAsistencia: body.estadoAsistencia,
+    };
+
+    await this.collection.doc(id).update(datosActualizados);
+    res.status(200).send("Actualizado con éxito");
+  } catch (err) {
+    res.status(500).send("Error actualizando: " + err.message);
   }
+}
+
   
 
   async borrar(req, res) {
