@@ -54,21 +54,22 @@ function parseBody(req) {
   }
 }
   
-  async actualizar(req, res) {
+async actualizar(req, res) {
   try {
-    const id = req.url.split("/").pop();
     const body = parseBody(req);
+    const { id, estudiante, estadoAsistencia } = body;
 
-    await this.collection.doc(id).update({
-      estudiante: body.estudiante,
-      estadoAsistencia: body.estadoAsistencia,
-    });
+    if (!id || !estudiante || !estadoAsistencia) {
+      return res.status(400).send("Faltan datos");
+    }
 
+    await this.collection.doc(id).update({ estudiante, estadoAsistencia });
     res.status(200).send("Actualizado con éxito");
   } catch (err) {
     res.status(500).send("Error actualizando: " + err.message);
   }
-  }
+}
+  
   
   async borrar(req, res) {
     try {
