@@ -43,30 +43,33 @@ class AsistenciaControlador {
       res.status(500).send("Error en ingresar: " + err.message);
     }
   }
-
+  
+function parseBody(req) {
+  if (Buffer.isBuffer(req.body)) {
+    return JSON.parse(req.body.toString("utf8"));
+  } else if (typeof req.body === "string") {
+    return JSON.parse(req.body);
+  } else {
+    return req.body;
+  }
+}
+  
   async actualizar(req, res) {
   try {
-    const id = req.url.split("/").pop(); // extrae el último segmento de la URL
-    let body = req.body;
+    const id = req.url.split("/").pop();
+    const body = parseBody(req);
 
-    if (Buffer.isBuffer(body)) {
-      body = JSON.parse(body.toString("utf8"));
-    }
-
-    const datosActualizados = {
+    await this.collection.doc(id).update({
       estudiante: body.estudiante,
       estadoAsistencia: body.estadoAsistencia,
-    };
+    });
 
-    await this.collection.doc(id).update(datosActualizados);
     res.status(200).send("Actualizado con éxito");
   } catch (err) {
     res.status(500).send("Error actualizando: " + err.message);
   }
-}
-
+  }
   
-
   async borrar(req, res) {
     try {
       const { id } = req.params;
