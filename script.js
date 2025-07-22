@@ -172,10 +172,10 @@ function confirmarEdicion(event) {
 
   const body = { estudiante: nuevoNombre, estadoAsistencia: nuevoEstado };
 
-fetch(`/.netlify/functions/asistencia`, {
+fetch(`/.netlify/functions/asistencia/${id}`, {
   method: "PUT",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ id, estudiante: nuevoNombre, estadoAsistencia: nuevoEstado })
+  body: JSON.stringify(body)
 })
     .then(response => {
       if (!response.ok) throw new Error("Error al actualizar");
