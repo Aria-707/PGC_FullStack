@@ -176,24 +176,6 @@ function cargar(resultado) {
   document.getElementById("rta").innerHTML = html;
 }
 
-// Función mejorada para escuchar cambios en tiempo real
-function escucharCambios() {
-  db.collection("asistenciaReconocimiento").onSnapshot(snapshot => {
-    console.log("📡 Datos recibidos del listener en tiempo real");
-    
-    datosActuales = snapshot.docs.map(doc => {
-      const data = doc.data();
-      console.log("Fecha raw del listener:", data.fechaYhora);
-      return {
-        id: doc.id,
-        ...data
-      };
-    });
-    
-    cargar(JSON.stringify(datosActuales));
-  });
-}
-
 function listar(event) {
   if (event) event.preventDefault();
 
