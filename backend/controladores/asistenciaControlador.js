@@ -55,32 +55,47 @@ function parseBody(req) {
 }
   
 async actualizar(req, res) {
-    try {
-      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-      const { estudiante, estadoAsistencia } = body;
-      const { id } = req.params;
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const { estudiante, estadoAsistencia } = body;
+    const { id } = req.params;
 
-      if (!id || !estudiante || !estadoAsistencia) {
-        return res.status(400).send("Faltan datos");
-      }
-
-      await this.collection.doc(id).update({ estudiante, estadoAsistencia });
-      res.status(200).send("Actualizado con éxito");
-    } catch (err) {
-      res.status(500).send("Error actualizando: " + err.message);
+    if (!id || !estudiante || !estadoAsistencia) {
+      return res.status(400).send("Faltan datos");
     }
+
+    const docRef = this.collection.doc(id);
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return res.status(404).send("No se encontró el registro");
+    }
+
+    await docRef.update({ estudiante, estadoAsistencia });
+    res.status(200).send("Actualizado con éxito");
+  } catch (err) {
+    console.error("🔥 Error en actualizar:", err);
+    res.status(500).send("Error actualizando: " + err.message);
   }
+}
   
   
-  async borrar(req, res) {
-    try {
-      const { id } = req.params;
-      await this.collection.doc(id).delete();
-      res.status(200).send("Eliminado con éxito");
-    } catch (err) {
-      res.status(500).send("Error eliminando: " + err.message);
+async borrar(req, res) {
+  try {
+    const { id } = req.params;
+    const docRef = this.collection.doc(id);
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return res.status(404).send("No se encontró el registro");
     }
-  }  
+
+    await docRef.delete();
+    res.status(200).send("Eliminado con éxito");
+  } catch (err) {
+    console.error("🔥 Error en borrar:", err);
+    res.status(500).send("Error eliminando: " + err.message);
+  }
 }
 
 module.exports = new AsistenciaControlador();
