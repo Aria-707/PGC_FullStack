@@ -172,7 +172,7 @@ function confirmarEdicion(event) {
 
   const body = { estudiante: nuevoNombre, estadoAsistencia: nuevoEstado };
 
-fetch(`/.netlify/functions/asistencia/${id}`, {
+fetch(`/.netlify/functions/asistencia`, {
   method: "PUT",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(body)
