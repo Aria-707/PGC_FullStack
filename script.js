@@ -171,26 +171,29 @@ function confirmarEdicion(event) {
   }
 
   const body = { estudiante: nuevoNombre, estadoAsistencia: nuevoEstado };
-
-fetch(`/.netlify/functions/asistencia`, {
-  method: "PUT",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(body)
-})
+  fetch(`/.netlify/functions/asistencia/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  })
     .then(response => {
-      if (!response.ok) throw new Error("Error al actualizar");
+      if (!response.ok) {
+        return response.text().then(text => {
+          throw new Error(text || "Error al actualizar");
+        });
+      }
       return response.text();
     })
     .then(data => {
+      alert("Registro actualizado exitosamente");
       cerrarPopup();
       listar();
     })
     .catch(error => {
       console.error("Error en editar:", error.message);
-      alert(error.message);
+      alert("Error al actualizar: " + error.message);
     });
 }
-
 
 let idAEliminar = null;
 
@@ -222,18 +225,25 @@ function confirmarEliminar() {
   if (!idAEliminar) return;
 
   fetch(`/.netlify/functions/asistencia/${idAEliminar}`, {
-    method: "DELETE"
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" }
   })
     .then(response => {
-      if (!response.ok) throw new Error("Error al eliminar");
+      if (!response.ok) {
+        return response.text().then(text => {
+          throw new Error(text || "Error al eliminar");
+        });
+      }
       return response.text();
     })
     .then(data => {
+      alert("Registro eliminado exitosamente");
       cerrarPopupEliminar();
       listar();
     })
     .catch(error => {
-      alert("Error: " + error.message);
+      console.error("Error al eliminar:", error.message);
+      alert("Error al eliminar: " + error.message);
     });
 }
 
