@@ -1,4 +1,3 @@
-
 const admin = require("../../netlify/functions/firebaseAdmin");
 
 class AsistenciaControlador {
@@ -12,7 +11,6 @@ class AsistenciaControlador {
     this.borrar = this.borrar.bind(this);
   }
 
-  // ✅ Método helper para parsear body
   parseBody(req) {
     try {
       if (Buffer.isBuffer(req.body)) {
@@ -64,14 +62,12 @@ class AsistenciaControlador {
   
   async actualizar(req, res) {
     try {
-      // ✅ Usar el método helper para parsear body
       const body = this.parseBody(req);
       const { estudiante, estadoAsistencia } = body;
       const { id } = req.params;
 
       console.log("📝 Datos recibidos para actualizar:", { id, estudiante, estadoAsistencia });
 
-      // ✅ Validación mejorada
       if (!id) {
         return res.status(400).send("ID es requerido");
       }
@@ -87,15 +83,12 @@ class AsistenciaControlador {
         return res.status(404).send("No se encontró el registro con ID: " + id);
       }
 
-      // ✅ CORRECCIÓN: Solo actualizar los campos que cambiaron, preservar fechaYhora
       const updateData = { 
         estudiante, 
         estadoAsistencia 
-        // NO incluimos fechaYhora para que se mantenga la original
       };
       await docRef.update(updateData);
       
-      // ✅ Obtener el documento actualizado con todos sus campos
       const updatedDoc = await docRef.get();
       const fullData = updatedDoc.data();
       
