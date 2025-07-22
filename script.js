@@ -2,7 +2,6 @@ let datosActuales = [];
 document.querySelectorAll('input[name="asignaturaFiltro"]').forEach(radio => {
   radio.addEventListener("change", () => {
     cargar(JSON.stringify(datosActuales));
-
   });
 });
 
@@ -48,7 +47,7 @@ function guardar(event) {
     })
     .then(result => {
       alert("Asistencia registrada");
-      listar();
+      // Removido listar() - el listener se encarga de actualizar
     })
     .catch(error => {
       alert("Error guardando: " + error.message);
@@ -235,7 +234,7 @@ function confirmarEdicion(event) {
     .then(data => {
       alert("Registro actualizado exitosamente");
       cerrarPopup();
-      listar();
+      // Removido listar() - el listener se encarga de actualizar automáticamente
     })
     .catch(error => {
       console.error("Error en editar:", error.message);
@@ -287,7 +286,7 @@ function confirmarEliminar() {
     .then(data => {
       alert("Registro eliminado exitosamente");
       cerrarPopupEliminar();
-      listar();
+      // Removido listar() - el listener se encarga de actualizar automáticamente
     })
     .catch(error => {
       console.error("Error al eliminar:", error.message);
@@ -299,7 +298,6 @@ function cerrarPopupEliminar() {
   idAEliminar = null;
   document.getElementById("popup-eliminar").style.display = "none";
 }
-
 
 function escucharCambios() {
   db.collection("asistenciaReconocimiento").onSnapshot(snapshot => {
