@@ -55,7 +55,49 @@ function guardar(event) {
     });
 }
 
-function obtenerSoloFecha(fecha) {
+function parsearFecha(fechaYhora) {
+  if (!fechaYhora) return null;
+  
+  let fecha;
+  
+  // Caso 1: Timestamp de Firestore desde API (tiene .seconds)
+  if (fechaYhora.seconds) {
+    fecha = new Date(fechaYhora.seconds * 1000);
+  }
+  // Caso 2: Timestamp de Firestore desde listener en tiempo real (es un objeto Timestamp)
+  else if (fechaYhora.toDate && typeof fechaYhora.toDate === 'function') {
+    fecha = fechaYhora.toDate();
+  }
+  // Caso 3: String de fecha
+  else if (typeof fechaYhora === 'string') {
+    fecha = new Date(fechaYhora);
+  }
+  // Caso 4: Número (timestamp en milisegundos)
+  else if (typeof fechaYhora === 'number') {
+    fecha = new Date(fechaYhora);
+  }
+  // Caso 5: Ya es un objeto Date
+  else if (fechaYhora instanceof Date) {
+    fecha = fechaYhora;
+  }
+  else {
+    console.warn('Formato de fecha no reconocido:', fechaYhora);
+    return null;
+  }
+  
+  // Verificar si la fecha es válida
+  if (isNaN(fecha.getTime())) {
+    console.warn('Fecha inválida generada:', fechaYhora);
+    return null;
+  }
+  
+  return fecha;
+}
+
+function obtenerSoloFecha(fechaYhora) {
+  const fecha = parsearFecha(fechaYhora);
+  if (!fecha) return "Sin fecha";
+  
   const opciones = {
     day: "2-digit",
     month: "2-digit",
@@ -64,7 +106,10 @@ function obtenerSoloFecha(fecha) {
   return fecha.toLocaleDateString("es-CO", opciones);
 }
 
-function obtenerSoloHora(fecha) {
+function obtenerSoloHora(fechaYhora) {
+  const fecha = parsearFecha(fechaYhora);
+  if (!fecha) return "Sin hora";
+  
   const opciones = {
     hour: "2-digit",
     minute: "2-digit",
@@ -75,7 +120,6 @@ function obtenerSoloHora(fecha) {
     .toLocaleTimeString("es-CO", opciones)
     .replace(/\s*(a\.m\.|p\.m\.)/, (_, periodo) => periodo.replace(".", ""));
 }
-
 
 function cargar(resultado) {
   let datos;
@@ -110,25 +154,44 @@ function cargar(resultado) {
   datos
     .filter(item => !asignaturaSeleccionada || item.asignatura === asignaturaSeleccionada)
     .forEach(item => {
-      const fecha = item.fechaYhora?.seconds
-      ? new Date(item.fechaYhora.seconds * 1000)
-      : new Date(item.fechaYhora);
-    html += `
-      <tr>
-      <td>${item.fechaYhora ? obtenerSoloFecha(fecha) : "Sin fecha"}</td>
-        <td>${item.fechaYhora ? obtenerSoloHora(fecha) : "Sin hora"}</td>
-        <td>${item.estudiante}</td>
-        <td>${item.estadoAsistencia}</td>
-        <td>
-          <button class="btn-editar" onclick="editar('${item.id}', '${item.estudiante}', '${item.estadoAsistencia}')">Editar</button>
-          <button class="btn-eliminar" onclick="eliminar('${item.id}')">Eliminar</button>
-        </td>
-      </tr>
-    `;
-  });
+      // Usar las funciones mejoradas que manejan todos los formatos
+      const fechaTexto = obtenerSoloFecha(item.fechaYhora);
+      const horaTexto = obtenerSoloHora(item.fechaYhora);
+      
+      html += `
+        <tr>
+          <td>${fechaTexto}</td>
+          <td>${horaTexto}</td>
+          <td>${item.estudiante}</td>
+          <td>${item.estadoAsistencia}</td>
+          <td>
+            <button class="btn-editar" onclick="editar('${item.id}', '${item.estudiante}', '${item.estadoAsistencia}')">Editar</button>
+            <button class="btn-eliminar" onclick="eliminar('${item.id}')">Eliminar</button>
+          </td>
+        </tr>
+      `;
+    });
 
   html += `</tbody></table>`;
   document.getElementById("rta").innerHTML = html;
+}
+
+// Función mejorada para escuchar cambios en tiempo real
+function escucharCambios() {
+  db.collection("asistenciaReconocimiento").onSnapshot(snapshot => {
+    console.log("📡 Datos recibidos del listener en tiempo real");
+    
+    datosActuales = snapshot.docs.map(doc => {
+      const data = doc.data();
+      console.log("Fecha raw del listener:", data.fechaYhora);
+      return {
+        id: doc.id,
+        ...data
+      };
+    });
+    
+    cargar(JSON.stringify(datosActuales));
+  });
 }
 
 function listar(event) {
