@@ -1,3 +1,4 @@
+
 const admin = require("../../netlify/functions/firebaseAdmin");
 
 class AsistenciaControlador {
@@ -86,12 +87,24 @@ class AsistenciaControlador {
         return res.status(404).send("No se encontró el registro con ID: " + id);
       }
 
-      // ✅ Actualizar con validación
-      const updateData = { estudiante, estadoAsistencia };
+      // ✅ CORRECCIÓN: Solo actualizar los campos que cambiaron, preservar fechaYhora
+      const updateData = { 
+        estudiante, 
+        estadoAsistencia 
+        // NO incluimos fechaYhora para que se mantenga la original
+      };
       await docRef.update(updateData);
       
+      // ✅ Obtener el documento actualizado con todos sus campos
+      const updatedDoc = await docRef.get();
+      const fullData = updatedDoc.data();
+      
       console.log("✅ Documento actualizado exitosamente:", id);
-      res.status(200).json({ message: "Actualizado con éxito", id, ...updateData });
+      res.status(200).json({ 
+        message: "Actualizado con éxito", 
+        id, 
+        ...fullData 
+      });
     } catch (err) {
       console.error("🔥 Error en actualizar:", err);
       res.status(500).send("Error actualizando: " + err.message);
